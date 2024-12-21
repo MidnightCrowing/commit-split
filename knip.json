@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignoreDependencies": [
+    "lint-staged"
+  ],
+  "rules": {
+    "types": "off",
+    "enumMembers": "off",
+    "exports": "off"
+  }
+}
