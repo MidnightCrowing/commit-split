@@ -1,7 +1,7 @@
 {
   "name": "commit-split",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.0-alpha2",
   "packageManager": "pnpm@9.5.0",
   "description": "A tool that uses AI to automatically split code changes into multiple commits with relevant titles",
   "author": "MidnightCrowing",
