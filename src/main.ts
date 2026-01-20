@@ -13,7 +13,7 @@ import { commitFiles, getRecentCommitTitles, isGitAvailable, isGitRepository } f
 import { getGitFileChanges } from './commit/gitStatusParser.js'
 import { modelConfig } from './config/config.js'
 import type { AICommit, GeneratorValidationResult, Model } from './config/types.js'
-import { BgGreen, green, logError, logInfo, logSuccess, logWarning, yellow } from './utils/consoleUtils.js'
+import { green, logError, logInfo, logSuccess, logWarning, yellow } from './utils/consoleUtils.js'
 import { outputModelList } from './utils/modelUtils.js'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -124,9 +124,7 @@ async function askToContinue(aiCommits: AICommit[], validationResult: GeneratorV
     logInfo('\n4. Proceeding with the commit...')
     await commitChanges(aiCommits, validationResult)
 
-    logInfo(BgGreen('\n                                                                 '))
-    logInfo(BgGreen('   [OK] Commit completed successfully!                           '))
-    logInfo(BgGreen('                                                                 '))
+    logInfo(green('✔ Commit completed successfully!                           '))
   }
   else {
     logWarning('\nCommit has been canceled.')
@@ -260,7 +258,8 @@ program
   .action(async () => {
     if (!process.argv.slice(2).length) {
       // 如果未传入任何参数，输出帮助信息
-      program.outputHelp()
+      await main('E:\\Projects\\commit-split')
+      // program.outputHelp()
     }
     else {
       const options = program.opts()

@@ -1,6 +1,8 @@
+import process from 'node:process'
+
 import type { FileChange } from '../config/types.js'
 import { FileState } from '../config/types.js'
-import { logError } from '../utils/consoleUtils.js'
+import { logError, logWarning, yellow } from '../utils/consoleUtils.js'
 import { getFileDiff, getGitStatusOutput } from './gitCommands.js'
 
 // 获取项目路径下的 Git 变更文件
@@ -19,7 +21,7 @@ export async function getGitFileChanges(): Promise<FileChange[]> {
 export async function parseGitStatusOutput(statusOutput: string): Promise<FileChange[]> {
   const fileChanges: FileChange[] = []
   const statusLines = statusOutput.split('\n')
-  const statusRegex = /^\s*([MARD]{1,2})\s{1,2}(.+)$/
+  const statusRegex = /^\s*([MARDU]{1,2}|\?\?)\s{1,2}(.+)$/
 
   for (const line of statusLines) {
     if (line.trim() === '') {
@@ -29,6 +31,17 @@ export async function parseGitStatusOutput(statusOutput: string): Promise<FileCh
     const match = line.match(statusRegex)
     if (match) {
       const [_, statusCode, filePath] = match
+
+      if (statusCode === '??') {
+        logWarning('Untracked file:', `${filePath} ${yellow('(skipping)')}`)
+        continue // 跳过未追踪文件
+      }
+      else if (statusCode.includes('U')) {
+        logWarning('Unmerged file:', `${filePath}`, true)
+        logWarning('Please resolve the conflict before running the program.')
+        process.exit(1) // 未合并的文件，退出进程
+      }
+
       const trimmedFilePath = filePath.trim()
       const fullFilePath = handleRenamedFilePath(trimmedFilePath)
 

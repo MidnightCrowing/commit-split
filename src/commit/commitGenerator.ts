@@ -109,15 +109,18 @@ export async function getAICommits(model: Model, baseURL: string, apiKey: string
     const chatCompletion = await client.chat.completions.create({
       model,
       messages: getAIMessages(fileChanges, gitHistoryTitle),
+      response_format: {
+        'type': 'json_object',
+      },
     })
 
     if (chatCompletion.choices && chatCompletion.choices[0]?.message?.content) {
       // 清理返回结果，去除Markdown格式
-      const cleanJson = chatCompletion.choices[0].message.content.replace(/```json|```/g, '').trim()
+      const jsonResult = chatCompletion.choices[0].message.content
 
       try {
         // 解析JSON数据并确保符合AICommit接口
-        const parsedData = JSON.parse(cleanJson)
+        const parsedData = JSON.parse(jsonResult)
 
         // 检查是否为有效的AICommit格式
         if (validateAICommit(parsedData)) {
@@ -133,7 +136,7 @@ export async function getAICommits(model: Model, baseURL: string, apiKey: string
       }
       catch {
         logInfo()
-        logError('The content returned by AI cannot be parsed as JSON:', cleanJson, true)
+        logError('The content returned by AI cannot be parsed as JSON:', jsonResult, true)
       }
     }
     else {
